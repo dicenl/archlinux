@@ -1,0 +1,158 @@
+# Partitions
+
+fdisk -l
+cfdisk
+select dos
+select new
+geef part size (40G)
+vervolgens primary
+select bootable
+select write
+select yes
+nu swap / kies new
+2048M
+select primary
+select write
+select yes
+create logical extended partition
+select new
+rest van de ruimte
+select extended
+scrol met pijltje naar free space
+select new
+wederom rest van ruimte selecteren
+select write
+type yes
+select quit
+fdisk -l
+
+# Format partions
+
+mkfs.ext4 /dev/sda1
+mkfs.ext4 /dev/sda5
+mkswap /dev/sda2
+swapon /dev/sda2
+
+
+# Install Base system
+
+mount /dev/sda1 /mnt
+mkdir /mnt/home
+mount /dev/sda5 /mnt/home
+pacstrap /mnt base base-devel
+
+# create fstab
+
+genfstab /mnt >> /mnt/etc/fstab 
+cat /mnt/etc/fstab
+
+# Arch basic config
+
+arch-chroot /mnt /bin/bash
+
+nano /etc/locale.gen
+uncomment en_US.UTF-8 UTF-8
+locale-gen
+nano /etc/locale.conf
+Add LANG=en_US.UTF-8
+save and close
+ls /usr/share/zoneinfo
+rm /etc/localtime
+ln -s /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime
+hwclock --systohc --utc
+passwd (set password for root)
+
+# Network config
+nano /etc/hostname
+arch-pc1
+systemctl enable dhcpcd
+
+# Grub install
+
+pacman -S grub os-prober
+grub-install /dev/sda
+grub-mkconfig -o /boot/grub/grub.cfg
+exit
+umount /mnt/home
+umount /mnt
+reboot
+
+# login with root
+
+useradd -m [username]
+passwd [username]
+<nw pw>
+
+visudo
+# voeg toe onder root
+evdberg ALL=(ALL) ALL
+
+nano /etc/hosts.deny
+ ALL: ALL: DENY
+
+nano /etc/hosts.allow
+ sshd: ALL: ALLOW
+
+
+pacman –S openssh bash-completion
+
+# Install KDE
+
+sudo pacman -S kde/kde-meta (either use kde or kde-meta)
+
+sudo nano ~/.xinitrc
+exec startkde
+startx
+sudo pacman -S ttf-dejavu (betere fonts)
+
+
+# Install Gnome Cinnamon
+
+pacman -Syu
+pacman -S xorg-server xorg-xinit mesa
+pacman -S cinnamon nemo-fileroller
+pacman -S gdm
+systemctl enable gdm
+systemctl start gdm
+pacman -S xorg-twm xterm xorg-xclock
+lspci | grep VGA
+pacman –Ss | grep lib32-ati
+pacman -Syu xf86-video-ati
+
+pacman -S pulseaudio pulseaudio-alsa pavucontrol gnome-terminal firefox flashplugin vlc unzip unrar p7zip deluge smplayer audacious qmmp gimp xfburn thunderbird gedit gnome-system-monitor
+pacman -S libreoffice
+
+# Network config
+
+pacman -S net-tools libgtop networkmanager network-manager-applet
+
+vi /etc/netctl/ens33
+Interface=ens33
+Connection=ethernet
+IP=static
+Address=('10.1.2.10/24')
+Gateway=('10.1.2.254')
+DNS=('10.1.2.254')
+
+netctl start ens33
+netctl enable ens33
+
+# disable suspend
+
+sudo machinectl shell gdm@ /bin/bash
+export GSETTINGS_BACKEND=dconf
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 0
+
+# Remote Desktop
+
+pacman -S git
+- login as user, not root
+git clone https://aur.archlinux.org/xrdp.git
+cd xrdp
+makepkg -si
+git clone https://aur.archlinux.org/xorgxrdp-git.git
+cd xorgrdp
+makepkg -si
+sudo nano /etc/X11/Xwrapper.conf
+- Add 
+allowed_users=anybody
