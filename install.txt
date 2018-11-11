@@ -4,23 +4,21 @@ fdisk -l
 cfdisk
 select dos
 select new
-geef part size (40G)
-vervolgens primary
+# Make it size (40G)
+select primary
 select bootable
-select write
-select yes
-nu swap / kies new
+swap / select new
 2048M
 select primary
 select write
 select yes
 create logical extended partition
 select new
-rest van de ruimte
+# use leftover space
 select extended
-scrol met pijltje naar free space
+scrol to free space
 select new
-wederom rest van ruimte selecteren
+# use all leftover space
 select write
 type yes
 select quit
@@ -50,11 +48,16 @@ cat /mnt/etc/fstab
 
 arch-chroot /mnt /bin/bash
 
+# now first create a new mirrorlist for fast download
+
+pacman -S reflector
+reflector --verbose --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
+
 nano /etc/locale.gen
 uncomment en_US.UTF-8 UTF-8
 locale-gen
 nano /etc/locale.conf
-Add LANG=en_US.UTF-8
+Add: LANG=en_US.UTF-8
 save and close
 ls /usr/share/zoneinfo
 rm /etc/localtime
@@ -81,7 +84,7 @@ reboot
 
 useradd -m [username]
 passwd [username]
-<nw pw>
+<new pw>
 
 visudo
 # voeg toe onder root
@@ -96,35 +99,38 @@ nano /etc/hosts.allow
 
 pacman –S openssh bash-completion
 
-# Install KDE
+# Install KDE Plasma 5
 
-sudo pacman -S kde/kde-meta (either use kde or kde-meta)
+pacman -S mesa ttf-hack ttf-anonymous-pro
+pacman -S tlp tlp-rdw acpi_call bash-completion git meld
+pacman -S ttf-dejavu ttf-freefont ttf-liberation
 
-sudo nano ~/.xinitrc
-exec startkde
-startx
-sudo pacman -S ttf-dejavu (betere fonts)
+pacman -S plasma-meta kf5 kdebase kdeutils kde-applications
+pacman -S kdegraphics gwenview
+pacman -S sddm sddm-kcm
+systemctl enable sddm
+
+# Setup audio 
+
+pacman -S alsa-utils pulseaudio pulseaudio-alsa libcanberra-pulse
+pacman -S libcanberra-gstreamer 
+pacman -S mpv 
 
 
-# Install Gnome Cinnamon
+# It is recommended to enable no-bitmaps to improve the font rendering
 
-pacman -Syu
-pacman -S xorg-server xorg-xinit mesa
-pacman -S cinnamon nemo-fileroller
-pacman -S gdm
-systemctl enable gdm
-systemctl start gdm
-pacman -S xorg-twm xterm xorg-xclock
-lspci | grep VGA
-pacman –Ss | grep lib32-ati
-pacman -Syu xf86-video-ati
+sudo ln -s /etc/fonts/conf.avail/70-no-bitmaps.conf /etc/fonts/conf.d
 
-pacman -S pulseaudio pulseaudio-alsa pavucontrol gnome-terminal firefox flashplugin vlc unzip unrar p7zip deluge smplayer audacious qmmp gimp xfburn thunderbird gedit gnome-system-monitor
+
+pacman -S firefox vlc unzip unrar p7zip deluge audacious gimp thunderbird 
 pacman -S libreoffice
 
 # Network config
 
 pacman -S net-tools libgtop networkmanager network-manager-applet
+
+
+# If DHCP is not configured or want static ip
 
 vi /etc/netctl/ens33
 Interface=ens33
@@ -136,23 +142,3 @@ DNS=('10.1.2.254')
 
 netctl start ens33
 netctl enable ens33
-
-# disable suspend
-
-sudo machinectl shell gdm@ /bin/bash
-export GSETTINGS_BACKEND=dconf
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 0
-
-# Remote Desktop
-
-pacman -S git
-- login as user, not root
-git clone https://aur.archlinux.org/xrdp.git
-cd xrdp
-makepkg -si
-git clone https://aur.archlinux.org/xorgxrdp-git.git
-cd xorgrdp
-makepkg -si
-sudo nano /etc/X11/Xwrapper.conf
-- Add 
-allowed_users=anybody
