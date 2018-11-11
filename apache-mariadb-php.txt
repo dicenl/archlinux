@@ -1,10 +1,12 @@
 # Installation of apache php and mariadb
 
 sudo pacman -S apache php 
-systemctl enable httpd
-systemctl restart httpd
+sudo systemctl enable httpd
+sudo systemctl restart httpd
 
 sudo pacman -S mysql
+sudo systemctl enable mysql
+sudo systemctl restart mysql
 
 # initialise database
 mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
