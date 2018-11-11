@@ -1,0 +1,39 @@
+# Installation of apache php and mariadb
+
+sudo pacman -S apache php 
+systemctl enable httpd
+systemctl restart httpd
+
+sudo pacman -S mysql
+
+# initialise database
+mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+
+# secure mysql installation
+sudo mysql_secure_installation
+
+# configure php
+sudo nano /etc/httpd/conf/httpd.conf
+
+# comment out 
+#LoadModule mpm_event_module modules/mod_mpm_event.so
+
+# to enable extensions scroll down or search for extensions en remove ; to enable
+;extension=bcmath
+;extension=bz2
+;extension=calendar
+extension=curl
+;extension=dba
+;extension=enchant
+;extension=exif
+;extension=ftp
+extension=gd
+extension=gettext
+;extension=gmp
+
+
+# test php
+sudo nano /srv/http/phpinfo.php
+<?php
+ phpinfo();
+?>
