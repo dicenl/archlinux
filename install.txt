@@ -127,7 +127,7 @@ pacman -S libreoffice
 
 # Network config
 
-pacman -S net-tools libgtop networkmanager network-manager-applet
+pacman -S net-tools openssh
 
 
 # If DHCP is not configured or want static ip
