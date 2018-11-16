@@ -128,6 +128,8 @@ pacman -S libreoffice
 # Network config
 
 pacman -S net-tools openssh
+systemctl enable sshd
+systemctl start sshd
 
 
 # If DHCP is not configured or want static ip
