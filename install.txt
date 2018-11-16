@@ -131,6 +131,14 @@ pacman -S net-tools openssh
 systemctl enable sshd
 systemctl start sshd
 
+# x2go 
+pacman -S x2go-server
+# add following to sshd
+AcceptEnv LANG LC_*
+
+sudo x2godbadmin --createdb
+pacman -S lxde
+
 
 # If DHCP is not configured or want static ip
 
