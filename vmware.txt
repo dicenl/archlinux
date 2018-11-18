@@ -1,0 +1,22 @@
+# Installation of vmware workstation (date november 18th 2018)
+# Follow step by step for dependencies and all to work
+
+git clone https://aur.archlinux.org/vmware-workstation.git
+git clone https://aur.archlinux.org/ncurses5-compat-libs.git
+cd ncurses5-compat-libs/
+makepkg -s --skippgpcheck
+sudo pacman -U *.tar.xz
+cd ../vmware-workstation
+makepkg -s
+sudo pacman -U *.tar.xz
+sudo pacman -Sy linux linux-headers
+sudo reboot
+sudo modprobe -a vmw_vmci vmmon
+sudo systemctl start vmware-networks
+sudo systemctl enable vmware-networks
+sudo systemctl start vmware-usbarbitrator
+sudo systemctl enable vmware-usbarbitrator
+sudo systemctl start vmware-hostd
+sudo systemctl enable vmware-hostd
+
+# Thats it. Background info @ https://linuxhint.com/install-vmware-workstation-pro-14-arch-linux/
