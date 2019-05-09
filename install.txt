@@ -152,3 +152,6 @@ DNS=('10.1.2.254')
 
 netctl start ens33
 netctl enable ens33
+
+sudo pacman -S ethtool
+sudo ethtool -s ens33 autoneg on
