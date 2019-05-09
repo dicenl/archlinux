@@ -155,3 +155,5 @@ netctl enable ens33
 
 sudo pacman -S ethtool
 sudo ethtool -s ens33 autoneg on
+
+https://wiki.archlinux.org/index.php/Google_Authenticator
